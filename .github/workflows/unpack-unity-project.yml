@@ -1,0 +1,33 @@
+name: Unpack Unity project archive
+
+on:
+  push:
+    paths:
+      - 'ByeByeBrain_Unity6_Prototype_v1.0.zip'
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Extract Unity project into repository root
+        run: |
+          unzip -q ByeByeBrain_Unity6_Prototype_v1.0.zip -d extracted
+          cp -a extracted/ByeByeBrain_Unity6/. .
+          rm -rf extracted
+          rm -f ByeByeBrain_Unity6_Prototype_v1.0.zip
+
+      - name: Commit extracted project files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Add Unity 6 project source files" || exit 0
+          git push
